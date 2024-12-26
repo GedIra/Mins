@@ -5,7 +5,6 @@ from .serializers import (
 from movies.models import (
   Movie, Review, Comment, Like
 )
-
 from rest_framework import generics
 from django.contrib.auth.decorators import user_passes_test
 from rest_framework.exceptions import ValidationError
@@ -20,7 +19,7 @@ class  UserRegistrationAPIView(generics.CreateAPIView):
 
   def perform_create(self, serializer):
     # Check if there is already a SignupRequest for the current user
-    queryset = User.objects.filter(user=self.request.user)
+    queryset = User.objects.filter(username=self.request.user)
     if queryset.exists():
       # If a SignupRequest exists, raise a ValidationError to prevent duplicate sign-ups
       raise ValidationError('You have already signed up')
@@ -36,12 +35,14 @@ class UserslistAPIView(generics.ListAPIView):
 
 class UserRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
   serializer_class = UserSerializer
+  lookup_field = 'username'
   permission_classes = []
   authentication_classes = []
   def get_queryset(self):
     user = self.request.user 
-    return User.objects.get(username = user.username)
-  
+    #return User.objects.filter(username = user.username)
+    return User.objects.all()
+
   
 class MovieListCreateAPIView(generics.ListCreateAPIView):
   serializer_class = MovieSerializer
@@ -61,6 +62,7 @@ class MovieListCreateAPIView(generics.ListCreateAPIView):
 class MovieRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
   serializer_class = MovieSerializer
   queryset = Movie.objects.all()
+  lookup_field = 'slug'
   permission_classes = []
   authentication_classes = []
 
@@ -77,8 +79,8 @@ class MovieRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
 class ReviewListCreateAPIView(generics.ListCreateAPIView):
   serializer_class = ReviewSerializer
   queryset = Review.objects.all()
-  permission_classes = []
-  authentication_classes = []
+  #permission_classes = []
+  #authentication_classes = []
     
   def perform_create(self, serializer):
     #sets Review auhtor to the currrent user

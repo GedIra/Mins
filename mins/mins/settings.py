@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'movies.apps.MoviesConfig',
     'rest_framework',
+    'django_countries',
+    'taggit',
 ]
 
 MIDDLEWARE = [
@@ -125,3 +127,5 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'movies.CustomUser'
+
+TAGGIT_CASE_INSENSITIVE = True
