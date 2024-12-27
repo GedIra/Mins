@@ -62,27 +62,57 @@ class UserRegistrationSerializer(serializers.HyperlinkedModelSerializer):
       password = validated_data['password']
     )
     return user
-  
-  
+
 class ReviewSerializer(serializers.HyperlinkedModelSerializer):
   author_username = serializers.CharField(source='author.username', read_only=True)
+  author = serializers.HyperlinkedRelatedField(
+    view_name='user-detail',
+    lookup_field = 'username',
+    read_only = True
+  )
+  movie = serializers.HyperlinkedRelatedField(
+    view_name='movie-detail',
+    queryset=Movie.objects.all(),
+    lookup_field = 'slug'
+  )
+
   class Meta:
     model = Review
-    fields = ['url', 'author_username', 'author', 'content', 'rating', 'created_at', 'updated_at']
-    read_only_fields = ['author', 'author_username', 'url']
+    fields = '__all__'
+    read_only_fields = ['author_username', 'url', 'slug']
     depth = 1
+
+    extra_kwargs = {
+      'url': {'view_name': 'review-detail', 'lookup_field': 'slug'}
+    }
     
 class CommentSerializer(serializers.HyperlinkedModelSerializer):
   author_username = serializers.CharField(source='author.username', read_only=True)
   
+  author = serializers.HyperlinkedRelatedField(
+    view_name='user-detail',
+    lookup_field = 'username',
+    read_only = True
+  )
+  review = serializers.HyperlinkedRelatedField(
+    view_name='movie-detail',
+    queryset=Review.objects.all(),
+    lookup_field = 'slug'
+  )
+  
   class Meta:
     model = Comment
-    fields = ['url', 'author_username', 'author', 'review', 'content', 'created_at', 'updated_at']
-    read_only_fields = ['author', 'url', 'author_username']
+    fields = '__all__'
+    read_only_fields = ['url', 'author_username', 'slug']
+    
+    extra_kwargs = {
+      'url' : {'view_name' : 'comment-detail', 'lookup_field':'slug'},
+    }
+
     
 class LikeSerializer(serializers.HyperlinkedModelSerializer):
   author_username = serializers.CharField(source='author.username', read_only=True)
   class Meta:
     model = Like
-    fields = ['url', 'author_username', 'author', 'review', 'content', 'liked_at', 'updated_at']
-    read_only_fields = ['author', 'url', 'author_username']
+    fields = '__all__'
+    read_only_fields = ['author', 'url', 'author_username', 'url']

@@ -29,6 +29,7 @@ class  UserRegistrationAPIView(generics.CreateAPIView):
 
 class UserslistAPIView(generics.ListAPIView):
   serializer_class = UserSerializer
+  lookup_field = 'username'
   queryset = User.objects.all()
   permission_classes = []
   authentication_classes = []
@@ -84,18 +85,20 @@ class ReviewListCreateAPIView(generics.ListCreateAPIView):
     
   def perform_create(self, serializer):
     #sets Review auhtor to the currrent user
-    serializer.save(author = self.request.author)
+    serializer.save(author = self.request.user)
     return super().perform_create(serializer)
 
   
 class ReviewRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
   serializer_class = ReviewSerializer
+  lookup_field = 'slug'
   permission_classes = []
   authentication_classes = []
   
   def get_queryset(self):
     user = self.request.user
-    return Review.objects.filter(author = user)
+    #return Review.objects.filter(author = user)
+    return Review.objects.all()
   
   def perform_update(self, serializer):
     #sets Review auhtor to the currrent user
@@ -115,6 +118,7 @@ class CommentListCreateAPIView(generics.ListCreateAPIView):
   
 class CommentRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
   serializer_class = CommentSerializer
+  lookup_field = 'slug'
   permission_classes = []
   authentication_classes = []
   

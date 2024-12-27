@@ -43,7 +43,7 @@ class Movie(models.Model):
   director = models.CharField(max_length=255)
   released_date = models.DateField()
   summary = models.TextField(blank=True, null=True)
-  slug = models.SlugField(unique=True)
+  slug = models.SlugField(unique=True, blank=True, null=True)
   tags = TaggableManager()
 
   class Meta:
@@ -89,7 +89,7 @@ class Review(models.Model):
   movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name='reviews')
   content = models.TextField()
   rating = models.IntegerField(choices=SCORE_CHOICES)
-  slug = models.SlugField(unique=True)
+  slug = models.SlugField(unique=True, blank=True, null=True)
   created_at = models.DateTimeField(auto_now_add=True)
   updated_at = models.DateTimeField(auto_now=True)
   
@@ -108,7 +108,7 @@ class Comment(models.Model):
   author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comments')
   review = models.ForeignKey(Review, on_delete=models.CASCADE, related_name='comments')
   content = models.TextField()
-  slug = models.SlugField(unique=True)
+  slug = models.SlugField(unique=True, null=True, blank=True)
   created_at = models.DateTimeField(auto_now_add=True)
   updated_at = models.DateTimeField(auto_now=True)
   
@@ -127,10 +127,13 @@ class Comment(models.Model):
     self.full_clean()  # This calls clean and ensures all validation is done
     return super().save(*args, **kwargs)
   
+  def __str__(self):
+    return f"{self.author} comment on {self.review}"
+  
 class Like(models.Model):
   author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='likes')
   review = models.ForeignKey(Review, on_delete=models.CASCADE, related_name='likes')
-  slug = models.SlugField(unique=True)
+  slug = models.SlugField(unique=True, null=True, blank=True)
   liked_at = models.DateTimeField(auto_now_add=True)
   updated_at = models.DateTimeField(auto_now=True)
 
