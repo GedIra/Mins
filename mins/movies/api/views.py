@@ -124,7 +124,8 @@ class CommentRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView)
   
   def get_queryset(self):
     user = self.request.user
-    return Comment.objects.filter(author = user)
+    #return Comment.objects.filter(author = user)
+    return Comment.objects.all()
   
   def perform_update(self, serializer):
     #sets Comment auhtor to the currrent user
@@ -143,6 +144,7 @@ class LikeListCreateAPIView(generics.ListCreateAPIView):
   
 class LikeRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
   serializer_class = LikeSerializer
+  lookup_field = 'slug'
   permission_classes = []
   authentication_classes = []
   

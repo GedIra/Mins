@@ -103,7 +103,7 @@ class CommentSerializer(serializers.HyperlinkedModelSerializer):
   class Meta:
     model = Comment
     fields = '__all__'
-    read_only_fields = ['url', 'author_username', 'slug']
+    read_only_fields = ['url', 'slug']
     
     extra_kwargs = {
       'url' : {'view_name' : 'comment-detail', 'lookup_field':'slug'},
@@ -112,7 +112,22 @@ class CommentSerializer(serializers.HyperlinkedModelSerializer):
     
 class LikeSerializer(serializers.HyperlinkedModelSerializer):
   author_username = serializers.CharField(source='author.username', read_only=True)
+  author = serializers.HyperlinkedRelatedField(
+    view_name = 'author-detail',
+    lookup_field = 'username',
+    read_only = True
+  )
+  review = serializers.HyperlinkedRelatedField(
+    view_name = 'review-detail',
+    lookup_field = 'slug',
+    queryset = Review.objects.all()
+  )
+  
   class Meta:
     model = Like
     fields = '__all__'
-    read_only_fields = ['author', 'url', 'author_username', 'url']
+    read_only_fields = ['url', 'slug']
+    
+    extra_kwargs = {
+      'url': {'view_name': 'like-detail', 'lookup_field': 'slug'}
+    }

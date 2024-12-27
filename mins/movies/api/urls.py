@@ -2,7 +2,7 @@ from django.urls import path
 from .views import (
   UserslistAPIView, UserRetrieveUpdateDestroyAPIView, UserRegistrationAPIView, MovieListCreateAPIView,
   MovieRetrieveUpdateDestroyAPIView, ReviewListCreateAPIView, ReviewRetrieveUpdateDestroyAPIView,
-  CommentListCreateAPIView, CommentRetrieveUpdateDestroyAPIView
+  CommentListCreateAPIView, CommentRetrieveUpdateDestroyAPIView, LikeListCreateAPIView, LikeRetrieveUpdateDestroyAPIView
 )
 
 urlpatterns = [
@@ -14,7 +14,7 @@ urlpatterns = [
   path('api/reviews/', ReviewListCreateAPIView.as_view(), name='reviews'),
   path('api/review/<slug:slug>/', ReviewRetrieveUpdateDestroyAPIView.as_view(), name='review-detail'),
   path('api/comments/', CommentListCreateAPIView.as_view(), name='comments'),
-  path('api/comment/<slug:slug>/', CommentListCreateAPIView.as_view(), name='comment-detail'),
-  
-  
+  path('api/comment/<slug:slug>/', CommentRetrieveUpdateDestroyAPIView.as_view(), name='comment-detail'),
+  path('api/likes/', LikeListCreateAPIView.as_view(), name='likes'),
+  path('api/like/<slug:slug>/', CommentListCreateAPIView.as_view(), name='like-detail'),
 ]
