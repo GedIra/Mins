@@ -9,13 +9,14 @@ from rest_framework import generics
 from django.contrib.auth.decorators import user_passes_test
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import (
-  IsAuthenticated, IsAdminUser, SAFE_METHODS,
-  DjangoModelPermissionsOrAnonReadOnly
-  )
+  IsAuthenticated, IsAdminUser, SAFE_METHODS, 
+  DjangoModelPermissionsOrAnonReadOnly, AllowAny, IsAuthenticatedOrReadOnly,
+)
 
 class  UserRegistrationAPIView(generics.CreateAPIView):
   serializer_class = UserRegistrationSerializer
   queryset = User.objects.all()
+  permission_classes = [AllowAny]
 
   def perform_create(self, serializer):
     # Check if there is already a SignupRequest for the current user
@@ -31,25 +32,21 @@ class UserslistAPIView(generics.ListAPIView):
   serializer_class = UserSerializer
   lookup_field = 'username'
   queryset = User.objects.all()
-  permission_classes = []
-  authentication_classes = []
-
+  permission_classes = [AllowAny]
+  
 class UserRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
   serializer_class = UserSerializer
   lookup_field = 'username'
-  permission_classes = []
-  authentication_classes = []
+  permission_classes = [IsAuthenticatedOrReadOnly]
   def get_queryset(self):
     user = self.request.user 
-    #return User.objects.filter(username = user.username)
-    return User.objects.all()
+    return User.objects.filter(username = user.username)
 
   
 class MovieListCreateAPIView(generics.ListCreateAPIView):
   serializer_class = MovieSerializer
   queryset = Movie.objects.all()
-  permission_classes = []
-  authentication_classes = []
+  permission_classes = [IsAuthenticatedOrReadOnly]
 
   def get_permissions(self):
     if self.request.method == 'POST':
@@ -65,7 +62,6 @@ class MovieRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
   queryset = Movie.objects.all()
   lookup_field = 'slug'
   permission_classes = []
-  authentication_classes = []
 
   def get_permissions(self):
     if self.request.method in SAFE_METHODS:
@@ -80,8 +76,8 @@ class MovieRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
 class ReviewListCreateAPIView(generics.ListCreateAPIView):
   serializer_class = ReviewSerializer
   queryset = Review.objects.all()
-  #permission_classes = []
-  #authentication_classes = []
+  permission_classes = [IsAuthenticatedOrReadOnly]
+
     
   def perform_create(self, serializer):
     #sets Review auhtor to the currrent user
@@ -92,13 +88,11 @@ class ReviewListCreateAPIView(generics.ListCreateAPIView):
 class ReviewRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
   serializer_class = ReviewSerializer
   lookup_field = 'slug'
-  permission_classes = []
-  authentication_classes = []
+  permission_classes = [IsAuthenticatedOrReadOnly]
   
   def get_queryset(self):
     user = self.request.user
-    #return Review.objects.filter(author = user)
-    return Review.objects.all()
+    return Review.objects.filter(author = user)
   
   def perform_update(self, serializer):
     #sets Review auhtor to the currrent user
@@ -108,8 +102,7 @@ class ReviewRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
 class CommentListCreateAPIView(generics.ListCreateAPIView):
   serializer_class = CommentSerializer
   queryset = Comment.objects.all()
-  permission_classes = []
-  authentication_classes = []
+  permission_classes = [IsAuthenticatedOrReadOnly]
   
   def perform_create(self, serializer):
     #sets Comment auhtor to the currrent user
@@ -119,14 +112,12 @@ class CommentListCreateAPIView(generics.ListCreateAPIView):
 class CommentRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
   serializer_class = CommentSerializer
   lookup_field = 'slug'
-  permission_classes = []
-  authentication_classes = []
+  permission_classes = [IsAuthenticatedOrReadOnly]
   
   def get_queryset(self):
     user = self.request.user
-    #return Comment.objects.filter(author = user)
-    return Comment.objects.all()
-  
+    return Comment.objects.filter(author = user)
+
   def perform_update(self, serializer):
     #sets Comment auhtor to the currrent user
     serializer.save(author = self.request.author)
@@ -135,8 +126,7 @@ class CommentRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView)
 class LikeListCreateAPIView(generics.ListCreateAPIView):
   serializer_class = LikeSerializer
   queryset = Like.objects.all()
-  permission_classes = []
-  authentication_classes = []
+  permission_classes = [IsAuthenticatedOrReadOnly]
   
   def perform_create(self, serializer):
     serializer.save(author = self.request.user)
@@ -145,8 +135,7 @@ class LikeListCreateAPIView(generics.ListCreateAPIView):
 class LikeRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
   serializer_class = LikeSerializer
   lookup_field = 'slug'
-  permission_classes = []
-  authentication_classes = []
+  permission_classes = [IsAuthenticatedOrReadOnly]
   
   def get_queryset(self):
     user = self.request.user

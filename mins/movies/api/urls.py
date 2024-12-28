@@ -4,8 +4,14 @@ from .views import (
   MovieRetrieveUpdateDestroyAPIView, ReviewListCreateAPIView, ReviewRetrieveUpdateDestroyAPIView,
   CommentListCreateAPIView, CommentRetrieveUpdateDestroyAPIView, LikeListCreateAPIView, LikeRetrieveUpdateDestroyAPIView
 )
+from rest_framework_simplejwt.views import (
+  TokenObtainPairView,
+  TokenRefreshView,
+)
 
 urlpatterns = [
+  path('api/login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+  path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
   path('api/users/', UserslistAPIView.as_view(), name='users'),
   path('api/user/<str:username>/', UserRetrieveUpdateDestroyAPIView.as_view(), name='user-detail'),
   path('api/register/', UserRegistrationAPIView.as_view(), name='register'),
@@ -16,5 +22,5 @@ urlpatterns = [
   path('api/comments/', CommentListCreateAPIView.as_view(), name='comments'),
   path('api/comment/<slug:slug>/', CommentRetrieveUpdateDestroyAPIView.as_view(), name='comment-detail'),
   path('api/likes/', LikeListCreateAPIView.as_view(), name='likes'),
-  path('api/like/<slug:slug>/', CommentListCreateAPIView.as_view(), name='like-detail'),
+  path('api/like/<slug:slug>/', LikeRetrieveUpdateDestroyAPIView.as_view(), name='like-detail'),
 ]

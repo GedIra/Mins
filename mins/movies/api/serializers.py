@@ -108,8 +108,7 @@ class CommentSerializer(serializers.HyperlinkedModelSerializer):
     extra_kwargs = {
       'url' : {'view_name' : 'comment-detail', 'lookup_field':'slug'},
     }
-
-    
+  
 class LikeSerializer(serializers.HyperlinkedModelSerializer):
   author_username = serializers.CharField(source='author.username', read_only=True)
   author = serializers.HyperlinkedRelatedField(
