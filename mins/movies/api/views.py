@@ -12,6 +12,9 @@ from rest_framework.permissions import (
   IsAuthenticated, IsAdminUser, SAFE_METHODS, 
   DjangoModelPermissionsOrAnonReadOnly, AllowAny, IsAuthenticatedOrReadOnly,
 )
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters
+from .filters import MovieFilter
 
 class  UserRegistrationAPIView(generics.CreateAPIView):
   serializer_class = UserRegistrationSerializer
@@ -42,10 +45,15 @@ class UserRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     user = self.request.user 
     return User.objects.filter(username = user.username)
 
-  
 class MovieListCreateAPIView(generics.ListCreateAPIView):
   serializer_class = MovieSerializer
   queryset = Movie.objects.all()
+  filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+  filterset_class = MovieFilter
+  search_fields = ['title', 'director', 'released_date']
+  ordering = ['title']
+  ordering_fields = '__all__'
+  
   permission_classes = [IsAuthenticatedOrReadOnly]
 
   def get_permissions(self):
@@ -56,10 +64,10 @@ class MovieListCreateAPIView(generics.ListCreateAPIView):
       # All users can retrieve and list movies
       self.permission_classes = [DjangoModelPermissionsOrAnonReadOnly]
     return super().get_permissions()
-
+  
 class MovieRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
   serializer_class = MovieSerializer
-  queryset = Movie.objects.all()
+  queryset =Movie.objects.all()
   lookup_field = 'slug'
   permission_classes = []
 
@@ -71,13 +79,11 @@ class MovieRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
       # Only admin users can update or delete movies
       self.permission_classes = [IsAdminUser]
     return super().get_permissions()
-  
-  
+   
 class ReviewListCreateAPIView(generics.ListCreateAPIView):
   serializer_class = ReviewSerializer
   queryset = Review.objects.all()
   permission_classes = [IsAuthenticatedOrReadOnly]
-
     
   def perform_create(self, serializer):
     #sets Review auhtor to the currrent user
