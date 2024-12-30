@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-mu-#o8*i9*dz^+d11p8z59k&(yub%uq&3*9)=+ly=ntj1ernar
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['gedira.pythonanywhere.com']
 
 
 # Application definition
