@@ -31,7 +31,7 @@ class MovieSerializer(TaggitSerializer, serializers.HyperlinkedModelSerializer):
 class UserSerializer(serializers.HyperlinkedModelSerializer):
   class Meta:
     model = User
-    fields = ['username', 'email', 'first_name', 'last_name', 'url']
+    fields = ['username', 'email', 'password','first_name', 'last_name', 'url']
     extra_kwargs = {
       'password':{'write_only': True}, #to avoid being displayed in the output
       'url': {'view_name': 'user-detail', 'lookup_field': 'username'},
@@ -51,15 +51,20 @@ class UserRegistrationSerializer(serializers.HyperlinkedModelSerializer):
     model = User
     fields = ['url', 'email', 'username', 'password']
     extra_kwargs = {
-      'password':{'write_only': True},
+      'password': {'write_only': True},
       'url': {'view_name': 'user-detail', 'lookup_field': 'username'}
     }
-    
+
   def create(self, validated_data):
-    user = User.objects.create_user( #create_user handles user creation and password harshing
-      email = validated_data['email'],
-      username = validated_data['username'],
-      password = validated_data['password']
+    password = validated_data.pop('password')  # Pop the password field
+    email = validated_data.pop('email')
+    username = validated_data.pop('username')
+
+    # Create the user with the provided data
+    user = User.objects.create_user(
+      email=email,
+      username=username,
+      password=password
     )
     return user
 

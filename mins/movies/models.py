@@ -9,13 +9,18 @@ from django.core.exceptions import ValidationError
 # Create your models here.
 
 class CustomUserManager(BaseUserManager):
-  def create_user(self, username, email, password= None):
+  def create_user(self, username, email, password=None):
     if not email:
       raise ValueError("The email is required")
     
     user = self.model(username=username, email=self.normalize_email(email))
     
-    user.set_password(password)
+    if password: 
+      user.set_password(password)
+    else:
+      raise ValueError("Password is required")
+    
+    user.is_active = True
     user.save(using = self._db)
     return user
 
