@@ -6,8 +6,6 @@ from movies.models import (
   Movie, Review, Comment, Like
 )
 from rest_framework import generics
-from django.contrib.auth.decorators import user_passes_test
-from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import (
   IsAuthenticated, IsAdminUser, SAFE_METHODS, 
   DjangoModelPermissionsOrAnonReadOnly, AllowAny, IsAuthenticatedOrReadOnly,
@@ -130,3 +128,5 @@ class LikeRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
   def perform_update(self, serializer):
     serializer.save(author = self.request.user)
     return super().perform_update(serializer)
+
+

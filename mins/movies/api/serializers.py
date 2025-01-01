@@ -7,9 +7,16 @@ User = get_user_model()
 
 class MovieSerializer(TaggitSerializer, serializers.HyperlinkedModelSerializer):
   tags = TagListSerializerField(write_only = True)
+  reviews = serializers.HyperlinkedRelatedField(
+    many = True,
+    read_only = True,
+    lookup_field = 'slug',
+    view_name ='review-detail'
+  )
+  
   class Meta:
     model = Movie
-    fields = '__all__'
+    fields = ['url', 'title', 'director', 'trailer', 'summary', 'released_date', 'reviews', 'slug', 'tags']
     read_only_fields = ['slug']
     extra_kwargs = {
       'tags': {'write_only': True}, #to avoid being displayed in the output
@@ -80,6 +87,12 @@ class ReviewSerializer(serializers.HyperlinkedModelSerializer):
     queryset=Movie.objects.all(),
     lookup_field = 'slug'
   )
+  comments = serializers.HyperlinkedRelatedField(
+    view_name='comment-detail',
+    read_only=True,
+    lookup_field = 'slug',
+    many = True
+  ) 
 
   class Meta:
     model = Review
