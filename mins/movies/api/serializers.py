@@ -77,6 +77,7 @@ class UserRegistrationSerializer(serializers.HyperlinkedModelSerializer):
 
 class ReviewSerializer(serializers.HyperlinkedModelSerializer):
   author_username = serializers.CharField(source='author.username', read_only=True)
+  likes_count = serializers.IntegerField(read_only=True)
   author = serializers.HyperlinkedRelatedField(
     view_name='user-detail',
     lookup_field = 'username',
@@ -117,7 +118,6 @@ class ReviewSerializer(serializers.HyperlinkedModelSerializer):
     
 class CommentSerializer(serializers.HyperlinkedModelSerializer):
   author_username = serializers.CharField(source='author.username', read_only=True)
-  
   author = serializers.HyperlinkedRelatedField(
     view_name='user-detail',
     lookup_field = 'username',
@@ -150,6 +150,11 @@ class LikeSerializer(serializers.HyperlinkedModelSerializer):
     lookup_field = 'slug',
     queryset = Review.objects.all()
   )
+  
+  def validate(self, data):
+    if Like.objects.filter(author=self.context['request'].user, review=data['review']).exists():
+      raise serializers.ValidationError("You have already liked this post")
+    return data
   
   class Meta:
     model = Like

@@ -3,7 +3,7 @@ from .views import (
   UserslistAPIView, UserRetrieveUpdateDestroyAPIView, UserRegistrationAPIView, MovieListCreateAPIView,
   MovieRetrieveUpdateDestroyAPIView, ReviewListCreateAPIView, ReviewRetrieveUpdateDestroyAPIView,
   CommentListCreateAPIView, CommentRetrieveUpdateDestroyAPIView, LikeListCreateAPIView, LikeRetrieveUpdateDestroyAPIView,
-  CustomTokenBlacklistView, CustomTokenRefreshView
+  CustomTokenBlacklistView, CustomTokenRefreshView, MostLikedReviews
 )
 from rest_framework_simplejwt.views import TokenObtainPairView
 
@@ -17,6 +17,7 @@ urlpatterns = [
   path('api/register/', UserRegistrationAPIView.as_view(), name='register'),
   path('api/movies/', MovieListCreateAPIView.as_view(), name='movies'),
   path('api/movie/<slug:slug>/', MovieRetrieveUpdateDestroyAPIView.as_view(), name='movie-detail'),
+  path('api/movie/<slug:slug>/reviews/', MostLikedReviews.as_view(), name='most-liked-reviews'),
   path('api/reviews/', ReviewListCreateAPIView.as_view(), name='reviews'),
   path('api/review/<slug:slug>/', ReviewRetrieveUpdateDestroyAPIView.as_view(), name='review-detail'),
   path('api/comments/', CommentListCreateAPIView.as_view(), name='comments'),

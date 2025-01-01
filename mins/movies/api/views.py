@@ -16,6 +16,7 @@ from rest_framework import filters, response, status
 from .filters import MovieFilter, ReviewFilter, CommnetFilter, LikeFilter
 from .permissions import IsAdminUserOrIsOwnerOrReadOnly, IsAdminUserOrIsUserOrReadOnly, IsAdminOrIsOwnRefreshToken
 from rest_framework_simplejwt.views import TokenBlacklistView, TokenRefreshView
+from django.db import models
 
 class UserRegistrationAPIView(generics.CreateAPIView):
   serializer_class = UserRegistrationSerializer
@@ -145,6 +146,12 @@ class LikeRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
   def perform_update(self, serializer):
     serializer.save(author = self.request.user)
     return super().perform_update(serializer)
+  
+class MostLikedReviews(generics.ListAPIView):
+  serializer_class = ReviewSerializer
+  def get_queryset(self):
+    slug = self.kwargs['slug']
+    return Review.objects.filter(movie__slug=slug).annotate(like_count=models.Count('likes')).order_by('-like_count')
 
 class CustomTokenBlacklistView(TokenBlacklistView):
   permission_classes = [IsAdminOrIsOwnRefreshToken]

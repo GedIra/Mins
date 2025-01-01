@@ -106,6 +106,12 @@ class Review(models.Model):
     self.full_clean()  # This calls clean and ensures all validation is done
     return super().save(*args, **kwargs)
   
+  def likes_count(self):
+    return self.likes.count()
+  
+  def comment_count(self):
+    return self.comments.count()
+  
   def __str__(self):
     return f'{self.rating} star review on {self.movie.title} by {self.author}'
   
