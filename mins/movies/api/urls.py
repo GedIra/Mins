@@ -2,15 +2,16 @@ from django.urls import path
 from .views import (
   UserslistAPIView, UserRetrieveUpdateDestroyAPIView, UserRegistrationAPIView, MovieListCreateAPIView,
   MovieRetrieveUpdateDestroyAPIView, ReviewListCreateAPIView, ReviewRetrieveUpdateDestroyAPIView,
-  CommentListCreateAPIView, CommentRetrieveUpdateDestroyAPIView, LikeListCreateAPIView, LikeRetrieveUpdateDestroyAPIView
+  CommentListCreateAPIView, CommentRetrieveUpdateDestroyAPIView, LikeListCreateAPIView, LikeRetrieveUpdateDestroyAPIView,
+  CustomTokenBlacklistView, CustomTokenRefreshView
 )
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenBlacklistView
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 
 urlpatterns = [
   path('api/login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-  path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-  path('api/logout/', TokenBlacklistView().as_view(), name='token_blacklist'),
+  path('api/token/refresh/', CustomTokenRefreshView.as_view(), name='token_refresh'),
+  path('api/logout/', CustomTokenBlacklistView.as_view(), name='token_blacklist'),
   path('api/users/', UserslistAPIView.as_view(), name='users'),
   path('api/user/<str:username>/', UserRetrieveUpdateDestroyAPIView.as_view(), name='user-detail'),
   path('api/register/', UserRegistrationAPIView.as_view(), name='register'),

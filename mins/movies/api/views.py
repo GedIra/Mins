@@ -11,14 +11,16 @@ from rest_framework.permissions import (
   DjangoModelPermissionsOrAnonReadOnly, AllowAny, IsAuthenticatedOrReadOnly,
 )
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters
-from .filters import MovieFilter
-from .permissions import IsAdminUserOrIsOwnerOrReadOnly, IsAdminUserOrIsUserOrReadOnly
+from django.core.exceptions import ValidationError
+from rest_framework import filters, response, status
+from .filters import MovieFilter, ReviewFilter, CommnetFilter, LikeFilter
+from .permissions import IsAdminUserOrIsOwnerOrReadOnly, IsAdminUserOrIsUserOrReadOnly, IsAdminOrIsOwnRefreshToken
+from rest_framework_simplejwt.views import TokenBlacklistView, TokenRefreshView
 
 class UserRegistrationAPIView(generics.CreateAPIView):
-    serializer_class = UserRegistrationSerializer
-    queryset = User.objects.all()
-    permission_classes = [AllowAny]
+  serializer_class = UserRegistrationSerializer
+  queryset = User.objects.all()
+  permission_classes = [AllowAny]
 
 class UserslistAPIView(generics.ListAPIView):
   serializer_class = UserSerializer
@@ -37,7 +39,7 @@ class MovieListCreateAPIView(generics.ListCreateAPIView):
   queryset = Movie.objects.all()
   filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
   filterset_class = MovieFilter
-  search_fields = ['title', 'director', 'released_date']
+  search_fields = ['title', 'director', 'released_date', 'tags__name__icontains']
   ordering = ['title']
   ordering_fields = '__all__'
   
@@ -71,6 +73,11 @@ class ReviewListCreateAPIView(generics.ListCreateAPIView):
   serializer_class = ReviewSerializer
   queryset = Review.objects.all()
   permission_classes = [IsAuthenticatedOrReadOnly]
+  filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+  filterset_class = ReviewFilter
+  search_fields = ['author__username', 'movie__title', 'rating']
+  ordering = ['author__username', 'rating']
+  ordering_fields = '__all__'
     
   def perform_create(self, serializer):
     #sets Review auhtor to the currrent user
@@ -86,17 +93,22 @@ class ReviewRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
   
   def perform_update(self, serializer):
     #sets Review auhtor to the currrent user
-    serializer.save(author = self.request.author)
+    serializer.save(author = self.request.user)
     return super().perform_update(serializer)
 
 class CommentListCreateAPIView(generics.ListCreateAPIView):
   serializer_class = CommentSerializer
   queryset = Comment.objects.all()
   permission_classes = [IsAuthenticatedOrReadOnly]
+  filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+  filterset_class = CommnetFilter
+  search_fields = ['author__username', 'review__author__username', 'review__rating', 'review__movie__title']
+  ordering = ['author__username']
+  ordering_fields = '__all__'
   
   def perform_create(self, serializer):
-    #sets Comment auhtor to the currrent user
-    serializer.save(author = self.request.author)
+    #sets Comment author to the currrent user
+    serializer.save(author = self.request.user)
     return super().perform_create(serializer)
   
 class CommentRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
@@ -114,6 +126,11 @@ class LikeListCreateAPIView(generics.ListCreateAPIView):
   serializer_class = LikeSerializer
   queryset = Like.objects.all()
   permission_classes = [IsAuthenticatedOrReadOnly]
+  filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+  filterset_class = LikeFilter
+  search_fields = ['author__username', 'review__author__username', 'review__rating', 'review__movie__title']
+  ordering = ['author__username']
+  ordering_fields = '__all__'
   
   def perform_create(self, serializer):
     serializer.save(author = self.request.user)
@@ -129,4 +146,8 @@ class LikeRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     serializer.save(author = self.request.user)
     return super().perform_update(serializer)
 
-
+class CustomTokenBlacklistView(TokenBlacklistView):
+  permission_classes = [IsAdminOrIsOwnRefreshToken]
+  
+class CustomTokenRefreshView(TokenRefreshView):
+  permission_classes = []

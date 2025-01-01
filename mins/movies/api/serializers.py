@@ -92,7 +92,18 @@ class ReviewSerializer(serializers.HyperlinkedModelSerializer):
     read_only=True,
     lookup_field = 'slug',
     many = True
-  ) 
+  )
+  likes = serializers.HyperlinkedRelatedField(
+    view_name='like-detail',
+    read_only=True,
+    lookup_field = 'slug',
+    many = True
+  )
+  def validate(self, data):
+    # Ensure that a review with the same author and movie does not already exist
+    if Review.objects.filter(author=self.context['request'].user, movie=data['movie']).exists():
+      raise serializers.ValidationError("You can't review the same movie twice.")
+    return data
 
   class Meta:
     model = Review
@@ -113,7 +124,7 @@ class CommentSerializer(serializers.HyperlinkedModelSerializer):
     read_only = True
   )
   review = serializers.HyperlinkedRelatedField(
-    view_name='movie-detail',
+    view_name='review-detail',
     queryset=Review.objects.all(),
     lookup_field = 'slug'
   )
@@ -130,7 +141,7 @@ class CommentSerializer(serializers.HyperlinkedModelSerializer):
 class LikeSerializer(serializers.HyperlinkedModelSerializer):
   author_username = serializers.CharField(source='author.username', read_only=True)
   author = serializers.HyperlinkedRelatedField(
-    view_name = 'author-detail',
+    view_name = 'user-detail',
     lookup_field = 'username',
     read_only = True
   )
